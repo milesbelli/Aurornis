@@ -1,0 +1,22 @@
+<div class="palm-row" x-mojo-tap-highlight="momentary">
+	<div class="palm-row-wrapper">
+		<img src=#{-user.profile_image_url} width="40" height="40" class="tweet-avatar">
+		<div class="tweet-guts">
+			<div class="tweet-timestamp">
+				#{-created_at_format}
+			</div>
+			<div class="tweet-user">
+				@#{-user.screen_name}
+			</div>
+			<div class="tweet-text">
+				#{-text}
+			</div>
+			<div class="tweet-smalls">
+				<div class="tweet-via">
+					#{-retweeted_by.rt_message} <span class="tweet-rtuser">#{-retweeted_by.screen_name}</span> via #{-source}
+				</div>
+				
+			</div>
+		</div>
+	</div>
+</div>

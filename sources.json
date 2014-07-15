@@ -1,0 +1,17 @@
+[
+    {"source": "app/assistants/stage-assistant.js"},
+    {"source": "app/libs/hextobase64.js"},
+    {"source": "app/libs/sha1.js"},
+    {"source": "app/libs/twitter.js"},
+    {"source": "app/libs/config/config.js"},
+    {"source": "app/libs/config/user.js"},
+    {"source": "app/libs/tempus-fugit.js"},
+    {
+        "scenes": "startup",
+        "source": "app/assistants/startup-assistant.js"
+    },
+    {
+        "scenes": "timeline",
+        "source": "app/assistants/timeline-assistant.js"
+    }
+]

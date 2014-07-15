@@ -1,0 +1,9 @@
+{
+	"id": "com.louismitas.aurornis",
+	"version": "0.0.45",
+	"vendor": "Louis Mitas",
+	"type": "web",
+	"main": "index.html",
+	"title": "Aurornis",
+	"icon": "icon.png"
+}
