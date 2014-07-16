@@ -4,6 +4,7 @@ function TimelineAssistant(timelines,page) {
 	   to the scene controller (this.controller) has not be established yet, so any initialization
 	   that needs the scene controller should be done in the setup function below. */
 	this.timelines = timelines;
+	this.scrollPos = [];
 	//this.timeline = timelines[page];
 	this.page = page;
 }
@@ -17,8 +18,6 @@ TimelineAssistant.prototype.setup = function() {
 	
 	/* add event handlers to listen to events from widgets */
 	
-	//Making change
-	
 	/* Setting up an object to return, in text, the name of the
 	 * scene element for timelines. */
 	this.sceneTimeline = {
@@ -27,20 +26,11 @@ TimelineAssistant.prototype.setup = function() {
 			directstimeline:  "directTimeLine"
 	};
 	
-	/* TODO: We need to get rid of this or something.
-	if (this.timeline == null){
-		
-		this.controller.get("tap-4-more").update("Getting tweets...");
-		var onSuccess = function(transport){
-			this.timeline = TwitterCall.getResponse(transport);
-			this.controller.get("tap-4-more").update("Tap to load more");
-			this.controller.get("homeTimeLine").mojo.noticeAddedItems(0,this.timeline).bind(this);
-			this.controller.modelChanged(this.homeTweetsModel).bind(this);
-		}.bind(this);
-		
-		this.getTimeline({count: 35}, onSuccess);
-		
-	}; */
+	this.sceneContainer = {
+			hometimeline: "HomeListContainer",
+			mentionstimeline: "MentionsListContainer",
+			directstimeline: "DirectsListContainer"
+	};
 	
 	/* Setup for header buttons */
 	this.topMenuModel = {
@@ -131,8 +121,6 @@ TimelineAssistant.prototype.handleCommand = function (event) {
 			
 			this.reenableBtn.delay(5);
 			
-			//Mojo.Log.info("Top Tweet",this.timeline[0].text);
-			
 			this.timelines[this.page] = TweetBuild.refreshTStamps(this.timelines[this.page]);
 			
 			/* These following two lines refresh the list of existing tweets with refreshed timestamps.
@@ -161,20 +149,12 @@ TimelineAssistant.prototype.handleCommand = function (event) {
 			this.getTimeline({since_id: lastId}, onSuccess);
 			break;
 		case "hometimeline":
-			var sceneInfo = {
-				transition: Mojo.Transition.crossFade,
-				name: "timeline"
-		};
-			//this.timelines[this.page] = this.timeline;
-			//Mojo.Controller.stageController.swapScene(sceneInfo,this.timelines,"hometimeline");
+			
+			this.transitionTimeline("hometimeline");
 			break;
 		case "mentionstimeline":
-			var sceneInfo = {
-				transition: Mojo.Transition.crossFade,
-				name: "timeline"
-		};
-			//this.timelines[this.page] = this.timeline;
-			//Mojo.Controller.stageController.swapScene(sceneInfo,this.timelines,"mentionstimeline");
+			
+			this.transitionTimeline("mentionstimeline");
 			break;
 		};
 	};
@@ -225,6 +205,40 @@ TimelineAssistant.prototype.tweetModel = function (){
 		break;
 	};
 };
+
+TimelineAssistant.prototype.transitionTimeline = function (destination) {
+	
+	this.scrollPos[this.page] = this.controller.sceneScroller.mojo.getState();
+	
+	this.transition = this.controller.prepareTransition(Mojo.Transition.crossFade);
+	this.controller.get(this.sceneContainer[this.page]).hide();
+	this.controller.get(this.sceneContainer[destination]).show();
+	this.controller.hideWidgetContainer(this.controller.get(this.sceneContainer[this.page]));
+	this.controller.showWidgetContainer(this.controller.get(this.sceneContainer[destination]));
+	
+	this.page = destination;
+	
+	if(this.scrollPos[this.page]) {
+		this.controller.sceneScroller.mojo.setState(this.scrollPos[this.page]);
+	};
+	
+	if (this.timelines[this.page].length < 1){
+		this.controller.get("tap-4-more").update("Getting tweets...");
+		var onSuccess = function(transport) {
+			this.timelines[this.page] = TwitterCall.getResponse(transport);
+			this.controller.get("tap-4-more").update("Tap to load more");
+			this.controller.get(this.sceneTimeline[this.page]).mojo.noticeUpdatedItems(0,this.timelines[this.page]).bind(this);
+			this.controller.modelChanged(this.tweetModel(),this);
+		}.bind(this);
+		
+		this.getTimeline({count: 35}, onSuccess);
+	};
+	
+	if (this.transition){
+		this.transition.run();
+		this.transition = undefined;
+	};
+}
 
 TimelineAssistant.prototype.activate = function(event) {
 	/* put in event handlers here that should only be in effect when this scene is active. For
