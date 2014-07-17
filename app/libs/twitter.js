@@ -4,7 +4,7 @@
 
 /* This var will hold stuff that doesn't really change so we can save time and not go crazy. */
 var requestParam = {
-		urlBase:     "https://api.twitter.com/1.1/statuses/",
+		urlBase:     "https://api.twitter.com/1.1/",
 		sigMeth:     "HMAC-SHA1",
 		version:     "1.0",
 		timeStamp:   function() {
@@ -28,10 +28,10 @@ TwitterCall.hometimeline = function(args,callback,onfail) {
 		TwitterCall.failHandler(transport);
 	};
 	
-	var url = requestParam.urlBase + "home_timeline.json";
+	var url = requestParam.urlBase + "statuses/home_timeline.json";
 	var header = TwitterFormat.getHeader("GET",url,args);
 	
-	TwitterCall.ajaxRequest(url,"GET",header,args,callback,onfail);
+	TwitterCall.ajaxRequest(url, "GET", header, args, callback, onfail);
 
 };
 TwitterCall.ajaxRequest = function (url,method,authHeader,args,callback,onfail){
@@ -52,10 +52,21 @@ TwitterCall.mentionstimeline = function(args,callback,onfail) {
 		TwitterCall.failHandler(transport);
 	};
 	
-	var url = requestParam.urlBase + "mentions_timeline.json";
+	var url = requestParam.urlBase + "statuses/mentions_timeline.json";
 	var header = TwitterFormat.getHeader("GET",url,args);
 	
-	TwitterCall.ajaxRequest(url,"GET",header,args,callback,onfail);
+	TwitterCall.ajaxRequest(url, "GET", header, args, callback, onfail);
+}
+TwitterCall.directstimeline = function(args,callback,onfail) {
+	
+	if (onfail == null) onfail = function(transport){
+		TwitterCall.failHandler(transport);
+	};
+	
+	var url = requestParam.urlBase + "direct_messages.json";
+	var header = TwitterFormat.getHeader("GET", url, args);
+	
+	TwitterCall.ajaxRequest(url, "GET", header, args, callback, onfail);
 }
 TwitterCall.getResponse = function(transport){
 	var response = transport.responseJSON;
@@ -224,7 +235,7 @@ TweetBuild.timeline = function(timeline){
 	Mojo.Log.info("size",timeline.length);
 	
 	for (var i = 0; i < timeline.length; i++){
-		//Mojo.Log.info("outer loop",i,timeline[i].user.screen_name);
+		Mojo.Log.info("outer loop",i,timeline[i].text);
 		/* Modify text and user info for retweets so they appear to be from OP */
 		if ("retweeted_status" in timeline[i]){
 			//Mojo.Log.info("we found one!",i)
@@ -238,8 +249,7 @@ TweetBuild.timeline = function(timeline){
 		/* Format the tweet for timeline appearance with HTML, which will be purely cosmetic */
 		timeline[i].text = TweetBuild.timelinetweet(timeline[i].text,timeline[i].entities);
 		timeline[i].created_at_format = relativeTime.simple(timeline[i].created_at);
-		timeline[i].source = TweetBuild.stripSourceHTML(timeline[i].source);
-		//Mojo.Log.info(timeline[i].text);
+		if(timeline[i].source) timeline[i].source = TweetBuild.stripSourceHTML(timeline[i].source);
 	};
 	
 	return timeline;

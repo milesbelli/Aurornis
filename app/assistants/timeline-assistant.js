@@ -93,6 +93,18 @@ TimelineAssistant.prototype.setup = function() {
 	
 	this.controller.setupWidget("mentionTimeLine",this.mentionAttributes,this.mentionTweetsModel);
 
+	/* Set up for directs timeline */
+	this.timelines["directstimeline"] = [];
+	this.directAttributes = {
+			itemTemplate: "timeline/message",
+			listTemplate: "timeline/container",
+			renderLimit: 800
+	};
+	this.directTweetsModel = {listTitle: "directs",
+			items: this.timelines["directstimeline"]
+	};
+	
+	this.controller.setupWidget("directTimeLine",this.directAttributes,this.directTweetsModel);
 	
 	/* Set up listeners for objects in the main body (not the widgets) */
 	this.controller.listen("tap-4-more", Mojo.Event.tap, this.handleMore.bindAsEventListener(this));
@@ -148,13 +160,17 @@ TimelineAssistant.prototype.handleCommand = function (event) {
 			
 			this.getTimeline({since_id: lastId}, onSuccess);
 			break;
-		case "hometimeline":
 			
+		case "hometimeline":
 			this.transitionTimeline("hometimeline");
 			break;
-		case "mentionstimeline":
 			
+		case "mentionstimeline":
 			this.transitionTimeline("mentionstimeline");
+			break;
+		
+		case "directstimeline":
+			this.transitionTimeline("directstimeline");
 			break;
 		};
 	};
@@ -173,12 +189,10 @@ TimelineAssistant.prototype.handleMore = function () {
 		this.timelines[this.page] = TweetBuild.refreshTStamps(this.timelines[this.page]);
 		this.timelines[this.page] = this.timelines[this.page].concat(response);
 		
-		/** Oh goodie, look! More homeTimeLine shit! This all needs
-		 * to be modified to allow for other timelines, like MENTIONS
-		 * and DIRECTS. Ho boy! **/
 		this.controller.get("tap-4-more").update("Tap to load more");
 		this.controller.get(this.sceneTimeline[this.page]).mojo.noticeAddedItems(oldSize,response).bind(this);
 		this.controller.modelChanged(this.tweetModel()).bind(this);
+		
 	}.bind(this);
 	
 	var onFailure = function (transport){
@@ -191,8 +205,19 @@ TimelineAssistant.prototype.handleMore = function () {
 };
 
 TimelineAssistant.prototype.getTimeline = function (args,onSuccess,onFailure) {
-	if (this.page == "hometimeline") TwitterCall.hometimeline(args,onSuccess,onFailure);
-	else if (this.page == "mentionstimeline") TwitterCall.mentionstimeline(args,onSuccess,onFailure);
+	//if (this.page == "hometimeline") TwitterCall.hometimeline(args,onSuccess,onFailure);
+	//else if (this.page == "mentionstimeline") TwitterCall.mentionstimeline(args,onSuccess,onFailure);
+	switch(this.page){
+	case "hometimeline":
+		TwitterCall.hometimeline(args,onSuccess,onFailure);
+		break;
+	case "mentionstimeline":
+		TwitterCall.mentionstimeline(args,onSuccess,onFailure);
+		break;
+	case "directstimeline":
+		TwitterCall.directstimeline(args,onSuccess,onFailure);
+		break;
+	};
 };
 
 TimelineAssistant.prototype.tweetModel = function (){
@@ -202,6 +227,9 @@ TimelineAssistant.prototype.tweetModel = function (){
 		break;
 	case "mentionstimeline":
 		return this.mentionTweetsModel;
+		break;
+	case "directstimeline":
+		return this.directTweetsModel;
 		break;
 	};
 };
@@ -220,10 +248,13 @@ TimelineAssistant.prototype.transitionTimeline = function (destination) {
 	
 	if(this.scrollPos[this.page]) {
 		this.controller.sceneScroller.mojo.setState(this.scrollPos[this.page]);
-	};
+	} else {
+		this.controller.sceneScroller.mojo.revealTop();
+		};
 	
 	if (this.timelines[this.page].length < 1){
 		this.controller.get("tap-4-more").update("Getting tweets...");
+		
 		var onSuccess = function(transport) {
 			this.timelines[this.page] = TwitterCall.getResponse(transport);
 			this.controller.get("tap-4-more").update("Tap to load more");

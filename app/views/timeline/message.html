@@ -1,0 +1,16 @@
+<div class="palm-row" x-mojo-tap-highlight="momentary">
+	<div class="palm-row-wrapper">
+		<img src=#{-sender.profile_image_url} width="40" height="40" class="tweet-avatar">
+		<div class="tweet-guts">
+			<div class="tweet-timestamp">
+				#{-created_at_format}
+			</div>
+			<div class="tweet-user">
+				@#{-sender.screen_name}
+			</div>
+			<div class="tweet-text">
+				#{-text}
+			</div>
+		</div>
+	</div>
+</div>
