@@ -75,7 +75,6 @@ TwitterCall.getResponse = function(transport){
 };
 TwitterCall.failHandler = function(transport){
 	var response = transport.responseJSON || "No response text.";
-	//Mojo.Log.info("ERROR:",response.errors[0].code,response.errors[0].message);
 	Mojo.Controller.getAppController().showBanner("Error: " + response.errors[0].message,{source: "notification"},"auroris");
 };
 
@@ -149,10 +148,9 @@ TwitterFormat.generateNonce = function (){
 		if (s == null) s = charString[charNum];
 		else s += charString[charNum];
 	};
-	//Mojo.Log.info("Nonce:",s);
-	//Mojo.Log.info("PEncode",TwitterFormat.percentEncode(s));
+	
 	s = btoa(s);
-	//Mojo.Log.info("Encoded",s);
+
 	return s;
 };
 TwitterFormat.getSignature = function(method,url,args){
@@ -170,10 +168,8 @@ TwitterFormat.getSignature = function(method,url,args){
 		else sigBaseParams += "&" + TwitterFormat.percentEncode(keylist[i]);
 		sigBaseParams += "=" + TwitterFormat.percentEncode(args[keylist[i]]);
 	};
-	//Mojo.Log.info("Params String:",sigBaseParams);
 	
 	sigBaseString += TwitterFormat.percentEncode(sigBaseParams);
-	//Mojo.Log.info("whole thing:",sigBaseString);
 	
 	var signingKey = TwitterFormat.percentEncode(Config.consumerSecret) +
 	                 "&" + TwitterFormat.percentEncode(User.secret);
@@ -184,7 +180,6 @@ TwitterFormat.getSignature = function(method,url,args){
 	
 	var oauthSig = base64Convert(signatureHash);
 	
-	//Mojo.Log.info("oauth signature:",oauthSig);
 	
 	return oauthSig;
 	
@@ -235,10 +230,8 @@ TweetBuild.timeline = function(timeline){
 	Mojo.Log.info("size",timeline.length);
 	
 	for (var i = 0; i < timeline.length; i++){
-		Mojo.Log.info("outer loop",i,timeline[i].text);
 		/* Modify text and user info for retweets so they appear to be from OP */
 		if ("retweeted_status" in timeline[i]){
-			//Mojo.Log.info("we found one!",i)
 			timeline[i].retweeted_by = timeline[i].user;
 			timeline[i].retweeted_by.rt_message = "retweeted by";   // Adding this for sake of Timeline
 			timeline[i].user = timeline[i].retweeted_status.user;
