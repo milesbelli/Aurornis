@@ -205,8 +205,6 @@ TimelineAssistant.prototype.handleMore = function () {
 };
 
 TimelineAssistant.prototype.getTimeline = function (args,onSuccess,onFailure) {
-	//if (this.page == "hometimeline") TwitterCall.hometimeline(args,onSuccess,onFailure);
-	//else if (this.page == "mentionstimeline") TwitterCall.mentionstimeline(args,onSuccess,onFailure);
 	switch(this.page){
 	case "hometimeline":
 		TwitterCall.hometimeline(args,onSuccess,onFailure);
