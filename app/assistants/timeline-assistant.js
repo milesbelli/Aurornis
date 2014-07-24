@@ -5,19 +5,10 @@ function TimelineAssistant(timelines,page) {
 	   that needs the scene controller should be done in the setup function below. */
 	this.timelines = timelines;
 	this.scrollPos = [];
-	//this.timeline = timelines[page];
 	this.page = page;
 }
 
 TimelineAssistant.prototype.setup = function() {
-	/* this function is for setup tasks that have to happen when the scene is first created */
-		
-	/* use Mojo.View.render to render view templates and add them to the scene, if needed */
-	
-	/* setup widgets here */
-	
-	/* add event handlers to listen to events from widgets */
-	
 	/* Setting up an object to return, in text, the name of the
 	 * scene element for timelines. */
 	this.sceneTimeline = {

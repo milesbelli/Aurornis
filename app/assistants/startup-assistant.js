@@ -34,6 +34,57 @@ StartupAssistant.prototype.setup = function() {
 	this.controller.get("tweetSpinner").style.marginTop = deviceHeight;
 	this.controller.get("loadingText").update("Connecting to Twitter...");
 	
+	
+	/* Setting up db for storing and retrieving Twitter token and any preferences.
+	 * db acct structure will probably look like this:
+	 * 
+	 * acctdb = { usertoken, usersecret, screenname, [array, of, drafts], ... }
+	 * 
+	 * We will want to add prefs to this eventually, but I have yet to determine
+	 * those.
+	 * 
+	 * Right now the only acct we'll have is "default" but in the future we could
+	 * easily support multiple accounts, possibly by having an array with their
+	 * names, then saving them in the depot by name, and then fetching them back
+	 * out that way. 
+	 * 
+	 * None of this works right now. Please ignore it.*/
+	this.depotOptions = {
+			name: "ext:aurornisUser"
+	};
+
+	var checkUserAcct = function() {
+		if(this.userAcct == null){
+			Mojo.Log.info("Null!");
+			var userInfo = {
+					token: "itsatoken",
+					secret: "itsasecret",
+					screenname: "milesbelli"
+					};
+			this.userdb.add("default",userInfo,genericSuccess,depotFailure);
+		} else {
+			Mojo.Log.info("not null!",this.userAcct.token);
+			};
+	}.bind(this);
+	
+	var genericSuccess = function(){
+		Mojo.Log.info("generic success!");
+	};
+	
+	var getUserAcct = function() {
+			Mojo.Log.info("db success");
+			this.userAcct = this.userdb.get("default",checkUserAcct,depotFailure);
+	}.bind(this);
+	
+	var depotFailure = function() {
+			Mojo.Log.info("db failure!");
+	};
+	
+	this.userdb = new Mojo.Depot(this.depotOptions,getUserAcct,depotFailure);
+	
+
+	
+	
 	TwitterCall.hometimeline({count: 35}, function(transport){
 		var response = TwitterCall.getResponse(transport);
 		

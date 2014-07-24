@@ -75,7 +75,7 @@ TwitterCall.getResponse = function(transport){
 };
 TwitterCall.failHandler = function(transport){
 	var response = transport.responseJSON || "No response text.";
-	Mojo.Controller.getAppController().showBanner("Error: " + response.errors[0].message,{source: "notification"},"auroris");
+	Mojo.Controller.getAppController().showBanner("Error: " + response.errors[0].message,{source: "notification"},"aurornis");
 };
 
 /* TwitterFormat is a function that should be exclusively called by TwitterCall. It's to help
