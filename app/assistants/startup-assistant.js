@@ -48,41 +48,12 @@ StartupAssistant.prototype.setup = function() {
 	 * names, then saving them in the depot by name, and then fetching them back
 	 * out that way. 
 	 * 
-	 * None of this works right now. Please ignore it.*/
+	 * Some of this works, but by all means continue to ignore it.*/
 	this.depotOptions = {
 			name: "ext:aurornisUser"
 	};
-
-	var checkUserAcct = function() {
-		if(this.userAcct == null){
-			Mojo.Log.info("Null!");
-			var userInfo = {
-					token: "itsatoken",
-					secret: "itsasecret",
-					screenname: "milesbelli"
-					};
-			this.userdb.add("default",userInfo,genericSuccess,depotFailure);
-		} else {
-			Mojo.Log.info("not null!",this.userAcct.token);
-			};
-	}.bind(this);
 	
-	var genericSuccess = function(){
-		Mojo.Log.info("generic success!");
-	};
-	
-	var getUserAcct = function() {
-			Mojo.Log.info("db success");
-			this.userAcct = this.userdb.get("default",checkUserAcct,depotFailure);
-	}.bind(this);
-	
-	var depotFailure = function() {
-			Mojo.Log.info("db failure!");
-	};
-	
-	this.userdb = new Mojo.Depot(this.depotOptions,getUserAcct,depotFailure);
-	
-
+	this.userdb = new Mojo.Depot(this.depotOptions,this.getUserAcct.bind(this),this.depotFailure.bind(this));
 	
 	
 	TwitterCall.hometimeline({count: 35}, function(transport){
@@ -98,6 +69,33 @@ StartupAssistant.prototype.setup = function() {
 				"hometimeline");
 	});
 
+};
+
+StartupAssistant.prototype.genericSuccess = function(){
+	Mojo.Log.info("generic success!");
+};
+
+StartupAssistant.prototype.getUserAcct = function(){
+	Mojo.Log.info("db success");
+	this.userdb.get("default",this.checkUserAcct.bind(this),this.depotFailure.bind(this));
+};
+
+StartupAssistant.prototype.checkUserAcct = function(dbResponse){
+	if(dbResponse == null){
+		Mojo.Log.info("It's null!");
+		var userInfo = {
+				token: "itsatoken",
+				secret: "itsasecret",
+				screenname: "milesbelli"
+				};
+		this.userdb.add("default",userInfo,this.genericSuccess.bind(this),this.depotFailure.bind(this));
+	} else {
+		Mojo.Log.info("Not null:",dbResponse.token);
+	};
+};
+
+StartupAssistant.prototype.depotFailure = function(){
+	Mojo.Log.info("db failure!");
 };
 
 StartupAssistant.prototype.activate = function(event) {
