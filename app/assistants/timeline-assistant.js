@@ -55,7 +55,8 @@ TimelineAssistant.prototype.setup = function() {
 	
 	};
 	
-	this.controller.setupWidget(Mojo.Menu.commandMenu, undefined, this.cmdMenuModel);
+	//this.controller.setupWidget(Mojo.Menu.commandMenu, undefined, this.cmdMenuModel);
+	this.controller.setupWidget(Mojo.Menu.commandMenu, {menuClass: 'no-fade'}, this.cmdMenuModel);
 	
 	
 	/* Setup for home timeline */
@@ -192,7 +193,7 @@ TimelineAssistant.prototype.handleMore = function () {
 		this.controller.get("tap-4-more").update("Tap to load more");
 	}.bind(this);
 	
-	this.getTimeline({max_id: oldestId, count: 50}, onSuccess, onFailure);
+	this.getTimeline({max_id: oldestId, count: 200}, onSuccess, onFailure);
 };
 
 TimelineAssistant.prototype.getTimeline = function (args,onSuccess,onFailure) {
